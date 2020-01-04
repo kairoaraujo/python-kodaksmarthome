@@ -1,13 +1,13 @@
-.. image:: https://travis-ci.org/kairoaraujo/kodak-smarthome-api.svg?branch=master
-    :target: https://travis-ci.org/kairoaraujo/kodak-smarthome-api
-.. image:: https://readthedocs.org/projects/kodak-smarthome-api/badge/?version=latest
-    :target: https://kodak-smarthome-api.readthedocs.io/en/latest/?badge=latest
-.. image:: https://codecov.io/gh/kairoaraujo/kodak-smarthome-api/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/kairoaraujo/kodak-smarthome-api
-.. image:: https://img.shields.io/pypi/v/kodak-smarthome-api.svg
-    :target: https://pypi.python.org/pypi/kodak-smarthome-api
-.. image:: https://img.shields.io/pypi/l/kodak-smarthome-api.svg
-    :target: https://pypi.python.org/pypi/kodak-smarthome-api
+.. image:: https://travis-ci.org/kairoaraujo/python-kodaksmarthome.svg?branch=master
+    :target: https://travis-ci.org/kairoaraujo/python-kodaksmarthome
+.. image:: https://readthedocs.org/projects/python-kodaksmarthome/badge/?version=latest
+    :target: https://python-kodaksmarthome.readthedocs.io/en/latest/?badge=latest
+.. image:: https://codecov.io/gh/kairoaraujo/python-kodaksmarthome/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/kairoaraujo/python-kodaksmarthome
+.. image:: https://img.shields.io/pypi/v/python-kodaksmarthome.svg
+    :target: https://pypi.python.org/pypi/python-kodaksmarthome
+.. image:: https://img.shields.io/pypi/l/python-kodaksmarthome.svg
+    :target: https://pypi.python.org/pypi/python-kodaksmarthome
 
 
 #######################
