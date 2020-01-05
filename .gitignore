@@ -1,5 +1,8 @@
 .idea
 coverage.xml
+.DS_Store
+.coverage
+make.bat
 nosetests.xml
 junit-report.xml
 pylint.txt

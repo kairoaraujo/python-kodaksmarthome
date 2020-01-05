@@ -11,6 +11,7 @@ from kodaksmarthome.constants import (
     HTTP_CODE,
     HTTP_CLIENT_MODEL,
     DEVICE_EVENT_BATTERY,
+    DEVICE_EVENT_SOUND,
     DEVICE_EVENT_MOTION,
     SUPPORTED_REGIONS,
     _URLS,
@@ -225,12 +226,16 @@ class KodakSmartHome:
         :return: None
         :exception: ``ConnectionError``
         """
-        self._get_options()
-        self._get_token()
-        self._authentication()
-        self._devices()
-        self._get_events()
-        self.is_connected = True
+        try:
+            self._get_options()
+            self._get_token()
+            self._authentication()
+            self._devices()
+            self._get_events()
+            self.is_connected = True
+
+        except requests.exceptions.ConnectionError as err:
+            raise ConnectionError(str(err))
 
     def disconnect(self):
         """
@@ -311,7 +316,7 @@ class KodakSmartHome:
         :param device_id: device id available in the device information
             ``KodakSmartHome.list_devices``
         :param event_type: Possible events``kodaksmarthome.constants``:
-            DEVICE_EVENT_MOTION, DEVICE_EVENT_BATTERY.
+            DEVICE_EVENT_MOTION, DEVICE_EVENT_SOUND, DEVICE_EVENT_BATTERY.
             Default: DEVICE_EVENT_MOTION
         :return: events type from specified device
         :rtype: list
@@ -381,7 +386,31 @@ class KodakSmartHome:
         """
         if self.is_connected:
             events = self._filter_event_type(
-                device_id=device_id, event_type=DEVICE_EVENT_MOTION
+                device_id=device_id, event_type=DEVICE_EVENT_BATTERY
+            )
+
+            if events is None:
+
+                return list()
+
+            return events
+
+        else:
+            raise ConnectionError(
+                f"Kodak Smarthome API is {self.is_connected}"
+            )
+
+    def get_sound_events(self, device_id=None):
+        """
+        List all sound devices events from specific device
+
+        :return: list of sound devices events
+        :exception: ``ConnectionError``
+        :rtype: list
+        """
+        if self.is_connected:
+            events = self._filter_event_type(
+                device_id=device_id, event_type=DEVICE_EVENT_SOUND
             )
 
             if events is None:

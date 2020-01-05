@@ -55,8 +55,8 @@ events_response = {
     "msg": "Success",
     "total_pages": 1,
     "data": {
-        'total_events': 6,
-        'total_pages': 1,
+        "total_events": 6,
+        "total_pages": 1,
         "events": [
             {
                 "id": "13889a30-227c-11ea-8790-3fdecad07f1c",
@@ -129,6 +129,13 @@ events_response = {
                 ],
                 "dv_data": None,
             },
+            {
+                "id": "c71516a0-2f3d-11ea-8790-3fdecad07f1c",
+                "event_type": 2,
+                "created_date": "2020-01-04T22:01:36.000Z",
+                "data": [],
+                "dv_data": None,
+            },
         ],
-    }
+    },
 }

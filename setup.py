@@ -54,7 +54,7 @@ with open(
 
 print(os.getcwd())
 print("#" * 80)
-with open("README.rst", "r", "utf-8") as f:
+with open("README.md", "r", "utf-8") as f:
     readme = f.read()
 
 with open("HISTORY.md", "r", "utf-8") as f:

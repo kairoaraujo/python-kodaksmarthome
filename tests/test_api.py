@@ -4,6 +4,7 @@
 # Copyright 2019, 2020 Kairo de Araujo
 #
 import pytest
+from requests import exceptions
 from unittest import mock
 
 from kodaksmarthome.api import KodakSmartHome
@@ -301,7 +302,7 @@ def test_get_battery_events():
     ]
     test_ksh.devices = devices_response["data"]["devices"]
 
-    assert len(test_ksh.get_battery_events(device_id="FAKEDEVICEID")) == 2
+    assert len(test_ksh.get_battery_events(device_id="FAKEDEVICEID")) == 3
 
 
 def test_get_battery_events_disconnected():
@@ -323,3 +324,38 @@ def test_get_battery_events_invalid_device_id():
     test_ksh.devices = devices_response["data"]["devices"]
 
     assert len(test_ksh.get_battery_events(device_id="INVALID")) == 0
+
+
+def test_get_sound_events():
+    test_ksh = KodakSmartHome("fake_user", "fake_pass")
+    test_ksh.is_connected = True
+    test_ksh.events = [
+        {
+            "device_id": devices_response["data"]["devices"][0]["device_id"],
+            "events": events_response["data"]["events"]
+        }
+    ]
+    test_ksh.devices = devices_response["data"]["devices"]
+
+    assert len(test_ksh.get_sound_events(device_id="FAKEDEVICEID")) == 1
+
+
+def test_get_sound_events_disconnected():
+    test_ksh = KodakSmartHome("fake_user", "fake_pass")
+
+    with pytest.raises(ConnectionError):
+        test_ksh.get_sound_events()
+
+
+def test_get_sound_events_invalid_device_id():
+    test_ksh = KodakSmartHome("fake_user", "fake_pass")
+    test_ksh.is_connected = True
+    test_ksh.events = [
+        {
+            "device_id": devices_response["data"]["devices"][0]["device_id"],
+            "events": events_response["data"]["events"]
+        }
+    ]
+    test_ksh.devices = devices_response["data"]["devices"]
+
+    assert len(test_ksh.get_sound_events(device_id="INVALID")) == 0

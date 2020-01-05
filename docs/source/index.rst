@@ -86,8 +86,8 @@ Listing devices, state, model and device id
 
 
 
-Listing last device motion events
-=================================
+Getting last device motion events and some details
+==================================================
 
 .. code-block:: python
 
@@ -95,14 +95,15 @@ Listing last device motion events
     >>> for event in motion_events[:2]:
     ...    print(f"snapshot: {event['snapshot']}")
     ...    print(f"video_recorded: {event['data'][0]['file']}")
-    ...    print(f"data: {event['created_date']}")
+    ...    print(f"data: {event['created_date']}\n")
 
     snapshot: http://video_url/00000222222222222222222/SNAPSHOT.jpg
     video_recorded: http://video_url/00000222222222222222222/VIDEO000001.flv
-    data: 2020-01-04T16:11:48.000Z
+    date: 2020-01-04T16:11:48.000Z
+
     snapshot: http://video_url/00000222222222222222222/SNAPSHOT
     video_recorded: http://video_url/00000222222222222222222/VIDEO000002.flv
-    data: 2020-01-04T16:08:52.000Z
+    date: 2020-01-04T16:08:52.000Z
 
 
 Indices and tables

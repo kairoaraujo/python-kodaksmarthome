@@ -7,6 +7,7 @@ from requests.status_codes import codes
 
 # DEVICES EVENTS
 DEVICE_EVENT_MOTION = 1
+DEVICE_EVENT_SOUND = 2
 DEVICE_EVENT_BATTERY = 7
 
 # REGION_URLS
