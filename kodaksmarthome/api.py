@@ -308,7 +308,7 @@ class KodakSmartHome:
                 return None
 
     def _filter_event_type(
-            self, device_id=None, event_type=DEVICE_EVENT_MOTION
+        self, device_id=None, event_type=DEVICE_EVENT_MOTION
     ):
         """
         Filter events from device by event type.
@@ -354,7 +354,8 @@ class KodakSmartHome:
 
     def get_motion_events(self, device_id=None):
         """
-        List all motion devices events from specific device
+        List all motion devices events from specific device sorted by
+        creation date.
 
         :return: list of motion devices events
         :exception: ``ConnectionError``
@@ -369,7 +370,7 @@ class KodakSmartHome:
 
                 return list()
 
-            return events
+            return sorted(events, key=lambda e: e['created_date'])
 
         else:
             raise ConnectionError(
@@ -378,7 +379,8 @@ class KodakSmartHome:
 
     def get_battery_events(self, device_id=None):
         """
-        List all battery devices events from specific device
+        List all battery devices events from specific device, sorted by
+        creation date.
 
         :return: list of battery devices events
         :exception: ``ConnectionError``
@@ -393,7 +395,7 @@ class KodakSmartHome:
 
                 return list()
 
-            return events
+            return sorted(events, key=lambda e: e['created_date'])
 
         else:
             raise ConnectionError(
@@ -402,7 +404,8 @@ class KodakSmartHome:
 
     def get_sound_events(self, device_id=None):
         """
-        List all sound devices events from specific device
+        List all sound devices events from specific device sorted by
+        creation date.
 
         :return: list of sound devices events
         :exception: ``ConnectionError``
@@ -417,7 +420,7 @@ class KodakSmartHome:
 
                 return list()
 
-            return events
+            return sorted(events, key=lambda e: e['created_date'])
 
         else:
             raise ConnectionError(
