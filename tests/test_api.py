@@ -4,7 +4,6 @@
 # Copyright 2019, 2020 Kairo de Araujo
 #
 import pytest
-from requests import exceptions
 from unittest import mock
 
 from kodaksmarthome.api import KodakSmartHome
@@ -25,7 +24,7 @@ def test__get_options(mock_requests, requests_session_mock_ok):
     mock_requests.Session.return_value = requests_session_mock_ok
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
 
-    assert test_ksh._get_options()
+    assert test_ksh._options()
 
 
 @mock.patch("kodaksmarthome.api.requests")
@@ -35,7 +34,7 @@ def test__get_options_exception(mock_requests, requests_session_mock_error):
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
 
     with pytest.raises(ConnectionError):
-        test_ksh._get_options()
+        test_ksh._options()
 
 
 @mock.patch("kodaksmarthome.api.requests")
@@ -44,7 +43,7 @@ def test__get_token(mock_requests, requests_session_mock_ok):
     mock_requests.Session.return_value = requests_session_mock_ok
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
 
-    assert test_ksh._get_token()
+    assert test_ksh._token()
 
 
 @mock.patch("kodaksmarthome.api.requests")
@@ -54,7 +53,7 @@ def test__get_token_exception(mock_requests, requests_session_mock_error):
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
 
     with pytest.raises(ConnectionError):
-        test_ksh._get_token()
+        test_ksh._token()
 
 
 @mock.patch("kodaksmarthome.api.requests")
@@ -85,7 +84,7 @@ def test__devices(mock_requests, requests_session_mock_ok):
     )
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
 
-    test_devices = test_ksh._devices()
+    test_devices = test_ksh._get_devices()
 
     assert test_devices == devices_response["data"]
 
@@ -97,7 +96,7 @@ def test__devices_exception(mock_requests, requests_session_mock_error):
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
 
     with pytest.raises(ConnectionError):
-        test_ksh._devices()
+        test_ksh._get_devices()
 
 
 @mock.patch("kodaksmarthome.api.requests")

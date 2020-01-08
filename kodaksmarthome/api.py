@@ -49,7 +49,7 @@ class KodakSmartHome:
         else:
             self.region_url = _URLS(SUPPORTED_REGIONS[region])
 
-    def _get_options(self):
+    def _options(self):
         """
         Verify the connection with Kodak Smart Home portal
 
@@ -66,7 +66,57 @@ class KodakSmartHome:
 
         return True
 
-    def _get_token(self):
+    def _http_request(self, method, url, headers, data):
+
+        try:
+            if method == "POST":
+                http_response = self.http_session.post(
+                    url, headers=headers, data=data
+                )
+            elif method == "OPTIONS":
+                http_response = self.http_session.post(
+                    url, headers=headers, data=data
+                )
+
+            elif method == "GET":
+                http_response = self.http_session.post(
+                    url, headers=headers, data=data
+                )
+
+            else:
+                raise AttributeError("Invalid Method")
+
+        except requests.exceptions.ConnectionError as err:
+            raise ConnectionError(str(err))
+
+        status_code = http_response.status_code
+        content_type = None
+        response_json = None
+        response_text = http_response.text
+        error = None
+        error_description = None
+
+        if "Content-Type" in http_response.headers:
+            content_type = http_response.headers["Content-Type"]
+
+        if content_type and "application/json" in content_type:
+            response_json = http_response.json()
+
+            if "error" in response_json:
+                error = response_json["error"]
+
+            if "error_description" in response_json:
+                error_description = response_json["error_description"]
+
+        if status_code == HTTP_CODE.OK:
+            return response_json
+
+        if status_code == HTTP_CODE.UNAUTHORIZED:
+            if error == "invalid_grant":
+                
+
+
+    def _token(self):
         """
         Get Kodak Smart Home Portal Token
 
@@ -144,7 +194,7 @@ class KodakSmartHome:
 
         return True
 
-    def _devices(self):
+    def _get_devices(self):
         """
         Get all devices available in Kodak Smart Home Portal
 
@@ -227,15 +277,24 @@ class KodakSmartHome:
         :exception: ``ConnectionError``
         """
         try:
-            self._get_options()
-            self._get_token()
+            self._options()
+            self._token()
             self._authentication()
-            self._devices()
+            self._get_devices()
             self._get_events()
             self.is_connected = True
 
         except requests.exceptions.ConnectionError as err:
             raise ConnectionError(str(err))
+
+    def update(self):
+        """
+        Update the device list and events data
+
+        :rtype: bool
+        """
+        self._get_devices()
+        self._get_events()
 
     def disconnect(self):
         """
