@@ -4,7 +4,7 @@
 # Copyright 2019, Kairo de Araujo
 #
 
-auth_body = {
+auth_response = {
     "status": 200,
     "msg": "Success",
     "data": {

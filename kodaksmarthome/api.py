@@ -49,38 +49,21 @@ class KodakSmartHome:
         else:
             self.region_url = _URLS(SUPPORTED_REGIONS[region])
 
-    def _options(self):
-        """
-        Verify the connection with Kodak Smart Home portal
-
-        :return: boolean result
-        :rtype: bool
-        """
-        options_response = self.http_session.options(
-            self.region_url.URL_TOKEN, headers=HTTP_HEADERS_BASIC
-        )
-        if options_response.status_code != HTTP_CODE.OK:
-            raise ConnectionError(
-                "HTTP CODE " + str(options_response.status_code)
-            )
-
-        return True
-
-    def _http_request(self, method, url, headers, data):
+    def _http_request(self, method, url, headers=None, data=None, params=None):
 
         try:
             if method == "POST":
                 http_response = self.http_session.post(
-                    url, headers=headers, data=data
+                    url, headers=headers, data=data, params=params
                 )
             elif method == "OPTIONS":
-                http_response = self.http_session.post(
-                    url, headers=headers, data=data
+                http_response = self.http_session.options(
+                    url, headers=headers, data=data, params=params
                 )
 
             elif method == "GET":
-                http_response = self.http_session.post(
-                    url, headers=headers, data=data
+                http_response = self.http_session.get(
+                    url, headers=headers, data=data, params=params
                 )
 
             else:
@@ -109,12 +92,78 @@ class KodakSmartHome:
                 error_description = response_json["error_description"]
 
         if status_code == HTTP_CODE.OK:
-            return response_json
+            if response_json:
+                self.is_connected = True
+                return response_json
+
+            elif response_json is None and method == "OPTIONS":
+                return True
+
+            else:
+                self.is_connected = False
+                raise TypeError("Unexpected response format")
 
         if status_code == HTTP_CODE.UNAUTHORIZED:
             if error == "invalid_grant":
-                
+                self.is_connected = False
 
+                raise ConnectionError(error_description)
+
+            elif (
+                type(error) == dict
+                and "reason" in error
+                and error["reason"] == "authError"
+                and self.is_connected
+            ):
+                self.is_connected = False
+
+            elif (
+                type(error) == dict
+                and "reason" in error
+                and error["reason"] == "authError"
+                and self.is_connected is False
+            ):
+                if "message" in error:
+                    raise ConnectionError(error["message"])
+
+            elif (
+                "msg" in response_json
+                and "Access Denied" in response_json["msg"]
+                and self.is_connected
+            ):
+                self.is_connected = False
+
+            elif (
+                "msg" in response_json
+                and "Access Denied" in response_json["msg"]
+                and self.is_connected is False
+            ):
+                self.is_connected
+                raise ConnectionError(response_json["error"])
+
+            else:
+                self.is_connected = False
+
+                raise ConnectionError("Unexpected 401 error " + response_text)
+
+        else:
+            self.is_connected
+            raise ConnectionError(
+                "Unexpected status_code error " + response_text
+            )
+
+    def _options(self):
+        """
+        Verify the connection with Kodak Smart Home portal
+
+        :return: boolean result
+        :rtype: bool
+        """
+        options_response = self._http_request(
+            "OPTIONS", self.region_url.URL_TOKEN, headers=HTTP_HEADERS_BASIC
+        )
+
+        return options_response
 
     def _token(self):
         """
@@ -139,29 +188,21 @@ class KodakSmartHome:
             + f"model={HTTP_CLIENT_MODEL}"
         )
 
-        token_response = self.http_session.post(
+        token_response = self._http_request(
+            "POST",
             self.region_url.URL_TOKEN,
             headers=HTTP_HEADERS_AUTH,
             data=token_payload,
         )
 
-        if token_response.status_code != HTTP_CODE.OK:
-            raise ConnectionError(
-                "HTTP CODE "
-                + str(token_response.status_code)
-                + "DETAILS "
-                + str(token_response.text)
-            )
-
-        token_json = token_response.json()
-        self.token_info["access_token"] = token_json["access_token"]
-        self.token_info["token_type"] = token_json["token_type"]
-        self.token_info["refresh_token"] = token_json["refresh_token"]
-        self.token_info["expires_in"] = token_json["expires_in"]
-        self.token_info["scope"] = token_json["scope"]
-        self.account_info = token_json["account_info"]
-        self.web_urls = token_json["web_urls"]
-        self.token_info["access_token"] = token_json["access_token"]
+        self.token_info["access_token"] = token_response["access_token"]
+        self.token_info["token_type"] = token_response["token_type"]
+        self.token_info["refresh_token"] = token_response["refresh_token"]
+        self.token_info["expires_in"] = token_response["expires_in"]
+        self.token_info["scope"] = token_response["scope"]
+        self.account_info = token_response["account_info"]
+        self.web_urls = token_response["web_urls"]
+        self.token_info["access_token"] = token_response["access_token"]
         self.token = self.token_info["access_token"]
 
         return True
@@ -174,23 +215,15 @@ class KodakSmartHome:
         :rtype: bool
         """
         auth_payload = f"username=&password={self.token}&rememberme=false"
-        auth_response = self.http_session.post(
+        auth_response = self._http_request(
+            "POST",
             self.region_url.URL_AUTH,
             headers=HTTP_HEADERS_AUTH,
             data=auth_payload,
         )
 
-        if auth_response.status_code != HTTP_CODE.OK:
-            raise ConnectionError(
-                "HTTP CODE "
-                + str(auth_response.status_code)
-                + "DETAILS "
-                + str(auth_response.text)
-            )
-
-        auth_json = auth_response.json()
         self.cookie = self.http_session.cookies["JSESSIONID"]
-        self.user_id = auth_json["data"]["id"]
+        self.user_id = auth_response["data"]["id"]
 
         return True
 
@@ -202,21 +235,19 @@ class KodakSmartHome:
         :rtype: list
         """
         parameters = {"access_token": f"{self.token}"}
-        devices_response = self.http_session.get(
+        devices_response = self._http_request(
+            "GET",
             self.region_url.URL_DEVICES,
             headers=HTTP_HEADERS_BASIC,
             params=parameters,
         )
-        if devices_response.status_code != HTTP_CODE.OK:
-            raise ConnectionError(
-                "HTTP CODE "
-                + str(devices_response.status_code)
-                + "DETAILS "
-                + str(devices_response.text)
-            )
 
-        devices_json = devices_response.json()
-        self.devices = devices_json["data"]
+        if self.is_connected is False:
+            self.connect()
+
+            return self.events
+
+        self.devices = devices_response["data"]
 
         return self.devices
 
@@ -228,11 +259,8 @@ class KodakSmartHome:
         :rtype: list
         """
         for device in self.devices:
-            device_id = device['device_id']
-            device_events = {
-                'device_id': device_id,
-                'events': list()
-            }
+            device_id = device["device_id"]
+            device_events = {"device_id": device_id, "events": list()}
             pages = 1
             events_pages = 1
             while pages <= events_pages:
@@ -243,28 +271,26 @@ class KodakSmartHome:
                     + f"page={pages}"
                 )
 
-                events_response = self.http_session.get(
-                    url_events, headers=HTTP_HEADERS_BASIC
+                events_response = self._http_request(
+                    "GET", url_events, headers=HTTP_HEADERS_BASIC
                 )
 
-                if events_response.status_code != HTTP_CODE.OK:
-                    raise ConnectionError(
-                        "HTTP CODE "
-                        + str(events_response.status_code)
-                        + "DETAILS "
-                        + str(events_response.text)
-                    )
+                if self.is_connected is False:
+                    self.connect()
 
-                events_json = events_response.json()
-                events_pages = events_json["data"]["total_pages"]
-                if events_json["data"]["total_events"] == 0:
+                    return self.events
+
+                events_pages = events_response["data"]["total_pages"]
+                if events_response["data"]["total_events"] == 0:
                     continue
-                events = events_json["data"]["events"]
+
+                events = events_response["data"]["events"]
                 for event in events:
-                    if event not in device_events['events']:
-                        device_events['events'].append(event)
+                    if event not in device_events["events"]:
+                        device_events["events"].append(event)
 
                 pages += 1
+
             self.events.append(device_events)
 
         return self.events
@@ -282,7 +308,6 @@ class KodakSmartHome:
             self._authentication()
             self._get_devices()
             self._get_events()
-            self.is_connected = True
 
         except requests.exceptions.ConnectionError as err:
             raise ConnectionError(str(err))
@@ -355,7 +380,7 @@ class KodakSmartHome:
             return self.events
 
         else:
-            if device_id in [d['device_id'] for d in self.devices]:
+            if device_id in [d["device_id"] for d in self.devices]:
                 device_events = list(
                     filter(lambda d: d["device_id"] == device_id, self.events)
                 )
@@ -429,7 +454,7 @@ class KodakSmartHome:
 
                 return list()
 
-            return sorted(events, key=lambda e: e['created_date'])
+            return sorted(events, key=lambda e: e["created_date"])
 
         else:
             raise ConnectionError(
@@ -454,7 +479,7 @@ class KodakSmartHome:
 
                 return list()
 
-            return sorted(events, key=lambda e: e['created_date'])
+            return sorted(events, key=lambda e: e["created_date"])
 
         else:
             raise ConnectionError(
@@ -479,7 +504,7 @@ class KodakSmartHome:
 
                 return list()
 
-            return sorted(events, key=lambda e: e['created_date'])
+            return sorted(events, key=lambda e: e["created_date"])
 
         else:
             raise ConnectionError(

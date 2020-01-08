@@ -7,8 +7,11 @@ import pytest
 from unittest import mock
 
 from kodaksmarthome.api import KodakSmartHome
+from kodaksmarthome.constants import HTTP_CODE
 from tests.conftest import MockRequestsResponse
-from tests.json_responses import devices_response, events_response
+from tests.json_responses import (
+    auth_response, devices_response, events_response
+)
 
 
 class TestKodakSmartHome:
@@ -18,38 +21,48 @@ class TestKodakSmartHome:
             KodakSmartHome("fake_user", "fake_pass", region="BR")
 
 
-@mock.patch("kodaksmarthome.api.requests")
-def test__get_options(mock_requests, requests_session_mock_ok):
+@mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
+def test__options(mock__http_request):
 
-    mock_requests.Session.return_value = requests_session_mock_ok
+    mock__http_request.return_value = True
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
 
     assert test_ksh._options()
 
 
-@mock.patch("kodaksmarthome.api.requests")
-def test__get_options_exception(mock_requests, requests_session_mock_error):
+@mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
+def test__options_exception(mock__http_request):
 
-    mock_requests.Session.return_value = requests_session_mock_error
+    mock__http_request.side_effect = [ConnectionError]
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
 
     with pytest.raises(ConnectionError):
         test_ksh._options()
 
 
-@mock.patch("kodaksmarthome.api.requests")
-def test__get_token(mock_requests, requests_session_mock_ok):
+@mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
+def test__token(mock__http_request):
 
-    mock_requests.Session.return_value = requests_session_mock_ok
+    mock__http_request.return_value = {
+        "access_token": "access_token",
+        "token_type": "token_type",
+        "refresh_token": "refresh_token",
+        "expires_in": "expires_in",
+        "scope": "scope",
+        "account_info": "account_info",
+        "web_urls": "web_urls",
+    }
+
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
 
     assert test_ksh._token()
+    assert test_ksh.token == "access_token"
 
 
-@mock.patch("kodaksmarthome.api.requests")
-def test__get_token_exception(mock_requests, requests_session_mock_error):
+@mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
+def test__get_token_exception(mock__http_request):
 
-    mock_requests.Session.return_value = requests_session_mock_error
+    mock__http_request.side_effect = [ConnectionError]
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
 
     with pytest.raises(ConnectionError):
@@ -57,58 +70,58 @@ def test__get_token_exception(mock_requests, requests_session_mock_error):
 
 
 @mock.patch("kodaksmarthome.api.requests")
-def test__authentication(mock_requests, requests_session_mock_ok):
+@mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
+def test__authentication(mock_requests, mock__http_request):
+    mocked_response = MockRequestsResponse(devices_response, HTTP_CODE.OK)
 
-    mock_requests.Session.return_value = requests_session_mock_ok
+    mock__http_request.return_value = auth_response
+    mock_requests.Session.return_value = mock.MagicMock(
+        get=mock.MagicMock(return_value=mocked_response)
+    )
+
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
 
     assert test_ksh._authentication()
 
 
-@mock.patch("kodaksmarthome.api.requests")
-def test__authentication_exception(mock_requests, requests_session_mock_error):
-
-    mock_requests.Session.return_value = requests_session_mock_error
+@mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
+def test__authentication_exception(mock__http_request):
+    mock__http_request.side_effect = [ConnectionError]
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
 
     with pytest.raises(ConnectionError):
         test_ksh._authentication()
 
 
-@mock.patch("kodaksmarthome.api.requests")
-def test__devices(mock_requests, requests_session_mock_ok):
+@mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
+def test__get_devices(mock__http_request):
 
-    mocked_response = MockRequestsResponse(devices_response, 200)
-    mock_requests.Session.return_value = mock.MagicMock(
-        get=mock.MagicMock(return_value=mocked_response)
-    )
+    mock__http_request.return_value = devices_response
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
+    test_ksh.is_connected = True
 
     test_devices = test_ksh._get_devices()
 
     assert test_devices == devices_response["data"]
 
 
-@mock.patch("kodaksmarthome.api.requests")
-def test__devices_exception(mock_requests, requests_session_mock_error):
-
-    mock_requests.Session.return_value = requests_session_mock_error
+@mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
+def test__get_devices_exception(mock__http_request):
+    mock__http_request.side_effect = [ConnectionError]
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
+    test_ksh.is_connected = True
 
     with pytest.raises(ConnectionError):
         test_ksh._get_devices()
 
 
-@mock.patch("kodaksmarthome.api.requests")
-def test__get_events(mock_requests):
+@mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
+def test__get_events(mock__http_request):
 
-    mocked_response = MockRequestsResponse(events_response, 200)
-    mock_requests.Session.return_value = mock.MagicMock(
-        get=mock.MagicMock(return_value=mocked_response)
-    )
+    mock__http_request.return_value = events_response
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
     test_ksh.devices = devices_response["data"]["devices"]
-    test_ksh.token = "abcdef0123456789"
+    test_ksh.is_connected = True
     test_events = test_ksh._get_events()
 
     expected_result = [
@@ -121,10 +134,10 @@ def test__get_events(mock_requests):
     assert test_events == expected_result
 
 
-@mock.patch("kodaksmarthome.api.requests")
-def test__get_events_none(mock_requests):
+@mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
+def test__get_events_none(mock__http_request):
     events_response_none = {
-        "status": 200,
+        "status": HTTP_CODE.OK,
         "msg": "Success",
         "total_pages": 0,
         "data": {
@@ -133,13 +146,13 @@ def test__get_events_none(mock_requests):
             "events": [],
         }
     }
-    mocked_response = MockRequestsResponse(events_response_none, 200)
-    mock_requests.Session.return_value = mock.MagicMock(
-        get=mock.MagicMock(return_value=mocked_response)
-    )
+
+    mock__http_request.return_value = events_response_none
+
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
     test_ksh.devices = devices_response["data"]["devices"]
     test_ksh.token = "abcdef0123456789"
+    test_ksh.is_connected = True
     test_events = test_ksh._get_events()
 
     expected_result = [
@@ -152,10 +165,10 @@ def test__get_events_none(mock_requests):
     assert test_events == expected_result
 
 
-@mock.patch("kodaksmarthome.api.requests")
-def test__get_events_exception(mock_requests, requests_session_mock_error):
+@mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
+def test__get_events_exception(mock__http_request):
 
-    mock_requests.Session.return_value = requests_session_mock_error
+    mock__http_request.side_effect = [ConnectionError]
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
     test_ksh.devices = devices_response["data"]["devices"]
     test_ksh.token = "abcdef0123456789"
@@ -164,14 +177,27 @@ def test__get_events_exception(mock_requests, requests_session_mock_error):
         test_ksh._get_events()
 
 
-@mock.patch("kodaksmarthome.api.requests")
-def test_connect(mock_requests, requests_session_mock_ok):
+@mock.patch("kodaksmarthome.api.KodakSmartHome._options")
+@mock.patch("kodaksmarthome.api.KodakSmartHome._token")
+@mock.patch("kodaksmarthome.api.KodakSmartHome._authentication")
+@mock.patch("kodaksmarthome.api.KodakSmartHome._get_devices")
+@mock.patch("kodaksmarthome.api.KodakSmartHome._get_events")
+def test_connect(
+    mock__options,
+    mock__token,
+    mock__authentication,
+    mock__get_devices,
+    mock__get_events
+):
+    mock__options.return_value = True
+    mock__token.return_value = True
+    mock__authentication.return_value = True
+    mock__get_devices.return_value = True
+    mock__get_events.return_value = True
 
-    mock_requests.Session.return_value = requests_session_mock_ok
     test_ksh = KodakSmartHome("fake_user", "fake_pass")
-    test_ksh.connect()
 
-    assert test_ksh.is_connected
+    assert test_ksh.connect() is None
 
 
 @mock.patch("kodaksmarthome.api.requests")
