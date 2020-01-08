@@ -3,17 +3,31 @@
 #
 # Copyright 2019, 2020 Kairo de Araujo
 #
+import json
 import pytest
 from unittest import mock
 
 
 class MockRequestsResponse:
-    def __init__(self, json_data, status_code):
+    def __init__(self, json_data, status_code, headers):
+        self._headers = headers
         self.json_data = json_data
-        self.status_code = status_code
+        self._status_code = status_code
 
     def json(self):
         return self.json_data
+
+    @property
+    def text(self):
+        return json.dumps(self.json_data)
+
+    @property
+    def headers(self):
+        return self._headers
+
+    @property
+    def status_code(self):
+        return self._status_code
 
 
 @pytest.fixture

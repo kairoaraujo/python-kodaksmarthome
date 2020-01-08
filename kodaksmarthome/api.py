@@ -56,6 +56,7 @@ class KodakSmartHome:
                 http_response = self.http_session.post(
                     url, headers=headers, data=data, params=params
                 )
+
             elif method == "OPTIONS":
                 http_response = self.http_session.options(
                     url, headers=headers, data=data, params=params
@@ -67,7 +68,7 @@ class KodakSmartHome:
                 )
 
             else:
-                raise AttributeError("Invalid Method")
+                raise AttributeError(f"Invalid Method {method}")
 
         except requests.exceptions.ConnectionError as err:
             raise ConnectionError(str(err))
@@ -103,7 +104,7 @@ class KodakSmartHome:
                 self.is_connected = False
                 raise TypeError("Unexpected response format")
 
-        if status_code == HTTP_CODE.UNAUTHORIZED:
+        elif status_code == HTTP_CODE.UNAUTHORIZED:
             if error == "invalid_grant":
                 self.is_connected = False
 
@@ -116,6 +117,7 @@ class KodakSmartHome:
                 and self.is_connected
             ):
                 self.is_connected = False
+                return True
 
             elif (
                 type(error) == dict
@@ -132,14 +134,15 @@ class KodakSmartHome:
                 and self.is_connected
             ):
                 self.is_connected = False
+                return True
 
             elif (
                 "msg" in response_json
                 and "Access Denied" in response_json["msg"]
                 and self.is_connected is False
             ):
-                self.is_connected
-                raise ConnectionError(response_json["error"])
+                self.is_connected = False
+                raise ConnectionError(response_json["msg"])
 
             else:
                 self.is_connected = False
@@ -147,9 +150,9 @@ class KodakSmartHome:
                 raise ConnectionError("Unexpected 401 error " + response_text)
 
         else:
-            self.is_connected
+            self.is_connected = False
             raise ConnectionError(
-                "Unexpected status_code error " + response_text
+                "Unexpected HTTP CODE error " + response_text
             )
 
     def _options(self):
@@ -245,7 +248,7 @@ class KodakSmartHome:
         if self.is_connected is False:
             self.connect()
 
-            return self.events
+            return self.devices
 
         self.devices = devices_response["data"]
 
@@ -316,7 +319,9 @@ class KodakSmartHome:
         """
         Update the device list and events data
 
+        :return: True
         :rtype: bool
+        :exception: ``ConnectionError``
         """
         self._get_devices()
         self._get_events()
@@ -328,12 +333,12 @@ class KodakSmartHome:
         :return: None
         :exception: ``ConnectionError``
         """
-        self.http_session.get(self.region_url.URL_LOGOUT)
+        self._http_request("GET", self.region_url.URL_LOGOUT)
         self.http_session.close()
         self.is_connected = False
 
     @property
-    def list_devices(self):
+    def get_devices(self):
         """
         List all registered devices in Kodak Smart Portal and its details.
 
