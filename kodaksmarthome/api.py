@@ -250,7 +250,8 @@ class KodakSmartHome:
 
             return self.devices
 
-        self.devices = devices_response["data"]
+        else:
+            self.devices = devices_response["data"]
 
         return self.devices
 
@@ -261,6 +262,7 @@ class KodakSmartHome:
         :return: all events
         :rtype: list
         """
+        self.events = list()
         for device in self.devices:
             device_id = device["device_id"]
             device_events = {"device_id": device_id, "events": list()}
@@ -280,8 +282,7 @@ class KodakSmartHome:
 
                 if self.is_connected is False:
                     self.connect()
-
-                    return self.events
+                    break
 
                 events_pages = events_response["data"]["total_pages"]
                 if events_response["data"]["total_events"] == 0:
@@ -390,7 +391,8 @@ class KodakSmartHome:
                     filter(lambda d: d["device_id"] == device_id, self.events)
                 )
 
-                return device_events[0]
+                events = device_events[0]["events"]
+                return sorted(events, key=lambda e: e["created_date"])
 
             else:
 
@@ -429,8 +431,7 @@ class KodakSmartHome:
             else:
                 motion_events = list(
                     filter(
-                        lambda e: e["event_type"] == event_type,
-                        device_events["events"],
+                        lambda e: e["event_type"] == event_type, device_events
                     )
                 )
 
