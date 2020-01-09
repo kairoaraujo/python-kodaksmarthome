@@ -8,6 +8,11 @@ dev
 
 -   \[Short description of non-trivial change.\]
 
+0.1.1 (09-02-2020)
+------------------
+- Fix update events
+
+
 0.1.0 (09-02-2020)
 -----------------
 - Initial version
