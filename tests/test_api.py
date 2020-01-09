@@ -400,7 +400,7 @@ def test__get_events_is_connected_false(mock__http_request, mock_connect):
     test_ksh.is_connected = False
     test_events = test_ksh._get_events()
 
-    assert test_events == []
+    assert test_events == [{"device_id": "FAKEDEVICEID", "events": []}]
 
 
 @mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
