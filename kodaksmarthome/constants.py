@@ -18,7 +18,14 @@ SUPPORTED_REGIONS = {
         "URL_AUTH": "https://app-eu.kodaksmarthome.com/web/authenticate",
         "URL_DEVICES": "https://app-eu.kodaksmarthome.com/web/user/device",
         "URL_LOGOUT": "https://app-eu.kodaksmarthome.com/web/#/user/logout",
-    }
+        },
+	"HK": {
+        "URL": "https://app-hk.kodaksmarthome.com/web",
+        "URL_TOKEN": "https://api-t01-r1.perimetersafe.com/v1/oauth/token",
+        "URL_AUTH": "https://app-hk.kodaksmarthome.com/web/authenticate",
+        "URL_DEVICES": "https://app-hk.kodaksmarthome.com/web/user/device",
+        "URL_LOGOUT": "https://app-hk.kodaksmarthome.com/web/#/user/logout",
+        }
 }
 
 
