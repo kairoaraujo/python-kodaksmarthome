@@ -1,0 +1,28 @@
+
+name: PyPI
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'kodaksmarthome/__version__.py'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.7'
+
+    # Publishes the new version in PyPi test
+    - name: Build the distribution
+      run: python setup.py sdist
+
+    # PyPI publish
+    - name: Publish distribution 📦 to Test PyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        password: ${{ secrets.pypi_password }}
