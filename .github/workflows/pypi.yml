@@ -3,9 +3,8 @@ name: PyPI
 
 on:
   push:
-    branches: [ master ]
-    paths:
-      - 'kodaksmarthome/__version__.py'
+    tags:
+    - '*'
 
 jobs:
   build:
