@@ -238,10 +238,10 @@ class KodakSmartHome:
         :rtype: list
         """
         parameters = {"access_token": f"{self.token}"}
-        
+
         headers = HTTP_HEADERS_BASIC
         headers["JSESSIONID"] = self.cookie
-        
+
         devices_response = self._http_request(
             "GET",
             self.region_url.URL_DEVICES,
@@ -266,10 +266,10 @@ class KodakSmartHome:
         :return: all events
         :rtype: list
         """
-        
+
         headers = HTTP_HEADERS_BASIC
         headers["JSESSIONID"] = self.cookie
-        
+
         self.events = list()
         for device in self.devices:
             device_id = device["device_id"]
