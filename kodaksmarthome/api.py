@@ -37,6 +37,7 @@ class KodakSmartHome:
         self.password = password
         self.http_session = requests.Session()
         self.token = None
+        self.cookie = None
         self.account_info = None
         self.web_urls = None
         self.devices = list()
