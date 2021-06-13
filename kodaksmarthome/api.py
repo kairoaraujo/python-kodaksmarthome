@@ -237,12 +237,14 @@ class KodakSmartHome:
         :return: all devices
         :rtype: list
         """
-        parameters = {"access_token": f"{self.token}"}
+
+        headers = HTTP_HEADERS_BASIC
+        headers["Authorization"] = f"Bearer {self.token}"
+
         devices_response = self._http_request(
             "GET",
             self.region_url.URL_DEVICES,
-            headers=HTTP_HEADERS_BASIC,
-            params=parameters,
+            headers=headers,
         )
 
         if self.is_connected is False:
@@ -262,6 +264,10 @@ class KodakSmartHome:
         :return: all events
         :rtype: list
         """
+
+        headers = HTTP_HEADERS_BASIC
+        headers["Authorization"] = f"Bearer {self.token}"
+
         self.events = list()
         for device in self.devices:
             device_id = device["device_id"]
@@ -271,13 +277,12 @@ class KodakSmartHome:
             while pages <= events_pages:
                 url_events = (
                     f"{self.region_url.URL}/user/device/event?"
-                    + f"access_token={self.token}&"
-                    + f"device_id={device_id}&"
+                    + f"deviceId={device_id}&"
                     + f"page={pages}"
                 )
 
                 events_response = self._http_request(
-                    "GET", url_events, headers=HTTP_HEADERS_BASIC
+                    "GET", url_events, headers=headers
                 )
 
                 if self.is_connected is False:
