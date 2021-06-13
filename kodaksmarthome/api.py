@@ -377,7 +377,7 @@ class KodakSmartHome:
         Get all device events
 
         :param device_id: device id available in the device information
-            ``KodakSmartHome.list_devices``
+            ``KodakSmartHome.get_devices``
         :type device_id: str
         :return: list events
         :rtype: list
@@ -405,7 +405,7 @@ class KodakSmartHome:
         Filter events from device by event type.
 
         :param device_id: device id available in the device information
-            ``KodakSmartHome.list_devices``
+            ``KodakSmartHome.get_devices``
         :param event_type: Possible events``kodaksmarthome.constants``:
             DEVICE_EVENT_MOTION, DEVICE_EVENT_SOUND, DEVICE_EVENT_BATTERY.
             Default: DEVICE_EVENT_MOTION
