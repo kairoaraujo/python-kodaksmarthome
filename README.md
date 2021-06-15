@@ -38,7 +38,7 @@ True
 ### Listing devices, state, model and device id
 
 ```pycon
->>> for device in my_home.list_devices:
+>>> for device in my_home.get_devices:
 ...   print(f"Device: {device['name']}")
 ...   print(f"Device ID: {device['device_id']})
 ...   print(f"Model: {device['model_name']})
@@ -58,7 +58,7 @@ Online: True
 
 ### Listing last device motion events
 
-```pycon   
+```pycon
 >>> motion_events = my_home.get_motion_events(device_id="00000222222222222222222")
 >>> for event in motion_events[:2]:
 ...    print(f"snapshot: {event['snapshot']}")

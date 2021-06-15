@@ -68,7 +68,7 @@ Listing devices, state, model and device id
 
 .. code-block:: python
 
-    >>> for device in my_home.list_devices:
+    >>> for device in my_home.get_devices:
     ...   print(f"Device: {device['name']}")
     ...   print(f"Device ID: {device['device_id']})
     ...   print(f"Model: {device['model_name']})
