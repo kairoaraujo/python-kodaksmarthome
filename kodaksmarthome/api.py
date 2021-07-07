@@ -42,12 +42,15 @@ class KodakSmartHome:
         self.devices = list()
         self.events = list()
         self.is_connected = False
-
         if region not in SUPPORTED_REGIONS:
             raise AttributeError(f"{region} is not supported")
 
         else:
             self.region_url = _URLS(SUPPORTED_REGIONS[region])
+            referer = self.region_url.URL.split("/web")[0]
+            HTTP_HEADERS_BASIC["Origin"] = self.region_url.URL
+            HTTP_HEADERS_BASIC["Referer"] = referer
+            self.basic_headers = HTTP_HEADERS_BASIC
 
     def _http_request(self, method, url, headers=None, data=None, params=None):
 
@@ -163,7 +166,7 @@ class KodakSmartHome:
         :rtype: bool
         """
         options_response = self._http_request(
-            "OPTIONS", self.region_url.URL_TOKEN, headers=HTTP_HEADERS_BASIC
+            "OPTIONS", self.region_url.URL_TOKEN, headers=self.basic_headers
         )
 
         return options_response
@@ -238,7 +241,7 @@ class KodakSmartHome:
         :rtype: list
         """
 
-        headers = HTTP_HEADERS_BASIC
+        headers = self.basic_headers
         headers["Authorization"] = f"Bearer {self.token}"
 
         devices_response = self._http_request(
@@ -265,7 +268,7 @@ class KodakSmartHome:
         :rtype: list
         """
 
-        headers = HTTP_HEADERS_BASIC
+        headers = self.basic_headers
         headers["Authorization"] = f"Bearer {self.token}"
 
         self.events = list()
