@@ -49,8 +49,6 @@ HTTP_HEADERS_BASIC = {
     "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
     "Cache-Control": "no-cache",
     "Connection": "keep-alive",
-    "Origin": "https://app-eu.kodaksmarthome.com",
-    "Referer": "https://app-eu.kodaksmarthome.com/web/",
     "Sec-Fetch-Site": "cross-site",
     "Sec-Fetch-Mode": "cors",
     "User-Agent": HTTP_CLIENT_MODEL,
