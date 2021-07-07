@@ -1,6 +1,7 @@
-[![Build Status](https://travis-ci.org/kairoaraujo/python-kodaksmarthome.svg?branch=master)](https://travis-ci.org/kairoaraujo/python-kodaksmarthome)
+[![Build Status](https://github.com/kairoaraujo/python-kodaksmarthome/actions/workflows/merge.yml/badge.svg)](https://github.com/kairoaraujo/python-kodaksmarthome/actions/workflows/merge.yml)
 [![Documentation Status](https://readthedocs.org/projects/python-kodaksmarthome/badge/?version=latest)](https://python-kodaksmarthome.readthedocs.io/en/latest/?badge=latest)
 [![codecov](https://codecov.io/gh/kairoaraujo/python-kodaksmarthome/branch/master/graph/badge.svg)](https://codecov.io/gh/kairoaraujo/python-kodaksmarthome)
+[![pypi Downloads](https://img.shields.io/pypi/dm/python-kodaksmarthome)](https://pypistats.org/packages/python-kodaksmarthome)
 [![pypi](https://img.shields.io/pypi/v/python-kodaksmarthome.svg)](https://pypi.python.org/pypi/python-kodaksmarthome)
 [![pypi](https://img.shields.io/pypi/l/python-kodaksmarthome.svg)](https://pypi.python.org/pypi/python-kodaksmarthome)
 
