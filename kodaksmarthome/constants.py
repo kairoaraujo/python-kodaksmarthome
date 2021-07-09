@@ -28,7 +28,7 @@ SUPPORTED_REGIONS = {
     },
     "HK": {
         "URL": "https://app-hk.kodaksmarthome.com/web",
-        "URL_TOKEN": "https://api-t01-r1.perimetersafe.com/v1/oauth/token",
+        "URL_TOKEN": "https://api-t01-r3.perimetersafe.com/v1/oauth/token",
         "URL_AUTH": "https://app-hk.kodaksmarthome.com/web/authenticate",
         "URL_DEVICES": "https://app-hk.kodaksmarthome.com/web/user/device",
         "URL_LOGOUT": "https://app-hk.kodaksmarthome.com/web/#/user/logout",
@@ -70,8 +70,6 @@ HTTP_HEADERS_BASIC = {
     "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8",
     "Cache-Control": "no-cache",
     "Connection": "keep-alive",
-    "Origin": "https://app-r1.kodaksmarthome.com",
-    "Referer": "https://app-r1.kodaksmarthome.com/web/",
     "Sec-Fetch-Site": "cross-site",
     "Sec-Fetch-Mode": "cors",
     "User-Agent": HTTP_CLIENT_MODEL,
