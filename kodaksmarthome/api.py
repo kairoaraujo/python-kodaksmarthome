@@ -3,6 +3,7 @@
 #
 # Copyright 2019 Kairo de Araujo
 #
+from time import sleep
 import requests
 
 from kodaksmarthome.constants import (
@@ -271,10 +272,20 @@ class KodakSmartHome:
         headers = self.basic_headers
         headers["Authorization"] = f"Bearer {self.token}"
 
-        self.events = list()
         for device in self.devices:
             device_id = device["device_id"]
-            device_events = {"device_id": device_id, "events": list()}
+            if device_id not in [d.get("device_id") for d in self.events]:
+                device_events = {"device_id": device_id, "events": list()}
+
+            else:
+                device_events = {
+                    "device_id": device_id,
+                    "events": self.get_events_device(device_id),
+                }
+                del self.events[
+                    [d.get("device_id") for d in self.events].index(device_id)
+                ]
+
             pages = 1
             events_pages = 1
             while pages <= events_pages:
@@ -283,6 +294,7 @@ class KodakSmartHome:
                     + f"deviceId={device_id}&"
                     + f"page={pages}"
                 )
+                sleep(3)
 
                 events_response = self._http_request(
                     "GET", url_events, headers=headers
@@ -297,6 +309,12 @@ class KodakSmartHome:
                     continue
 
                 events = events_response["data"]["events"]
+
+                if events[0].get("id") in [
+                    e.get("id") for e in device_events.get("events")
+                ]:
+                    break
+
                 for event in events:
                     if event not in device_events["events"]:
                         device_events["events"].append(event)
@@ -306,6 +324,50 @@ class KodakSmartHome:
             self.events.append(device_events)
 
         return self.events
+
+    def _filter_event_type(
+        self, device_id=None, event_type=DEVICE_EVENT_MOTION
+    ):
+        """
+        Filter events from device by event type.
+
+        :param device_id: device id available in the device information
+            ``KodakSmartHome.get_devices``
+        :param event_type: Possible events``kodaksmarthome.constants``:
+            DEVICE_EVENT_MOTION, DEVICE_EVENT_SOUND, DEVICE_EVENT_BATTERY.
+            Default: DEVICE_EVENT_MOTION
+        :return: events type from specified device
+        :rtype: list
+        """
+        if self.is_connected:
+            device_events = self.get_events_device(device_id=device_id)
+
+            if device_events is None:
+                return None
+
+            if device_id is None:
+                motion_events = list()
+                for device in device_events:
+                    motion_events += list(
+                        filter(
+                            lambda e: e["event_type"] == event_type,
+                            device["events"],
+                        )
+                    )
+
+            else:
+                motion_events = list(
+                    filter(
+                        lambda e: e["event_type"] == event_type, device_events
+                    )
+                )
+
+            return motion_events
+
+        else:
+            raise ConnectionError(
+                f"Kodak Smarthome API is {self.is_connected}"
+            )
 
     def connect(self):
         """
@@ -390,7 +452,7 @@ class KodakSmartHome:
         :return: list events
         :rtype: list
         """
-        if device_id is None:
+        if device_id is None or len(self.events) == 0:
             return self.events
 
         else:
@@ -405,50 +467,6 @@ class KodakSmartHome:
             else:
 
                 return None
-
-    def _filter_event_type(
-        self, device_id=None, event_type=DEVICE_EVENT_MOTION
-    ):
-        """
-        Filter events from device by event type.
-
-        :param device_id: device id available in the device information
-            ``KodakSmartHome.get_devices``
-        :param event_type: Possible events``kodaksmarthome.constants``:
-            DEVICE_EVENT_MOTION, DEVICE_EVENT_SOUND, DEVICE_EVENT_BATTERY.
-            Default: DEVICE_EVENT_MOTION
-        :return: events type from specified device
-        :rtype: list
-        """
-        if self.is_connected:
-            device_events = self.get_events_device(device_id=device_id)
-
-            if device_events is None:
-                return None
-
-            if device_id is None:
-                motion_events = list()
-                for device in device_events:
-                    motion_events += list(
-                        filter(
-                            lambda e: e["event_type"] == event_type,
-                            device["events"],
-                        )
-                    )
-
-            else:
-                motion_events = list(
-                    filter(
-                        lambda e: e["event_type"] == event_type, device_events
-                    )
-                )
-
-            return motion_events
-
-        else:
-            raise ConnectionError(
-                f"Kodak Smarthome API is {self.is_connected}"
-            )
 
     def get_motion_events(self, device_id=None):
         """
