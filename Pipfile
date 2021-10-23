@@ -11,9 +11,10 @@ flake8 = "*"
 sphinx = "*"
 sphinx-rtd-theme = "*"
 codecov = "*"
+black = "==21.9b0"
 
 [packages]
 requests = "*"
 
 [requires]
-python_version = "3.7"
+python_version = ">=3.7"

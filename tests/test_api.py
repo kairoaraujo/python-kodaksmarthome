@@ -390,6 +390,30 @@ def test__get_events(mock__http_request):
 
 
 @mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
+def test__get_events_with_existent_events(mock__http_request):
+
+    mock__http_request.return_value = events_response
+    test_ksh = KodakSmartHome("fake_user", "fake_pass")
+    test_ksh.devices = devices_response["data"]["devices"]
+    test_ksh.is_connected = True
+    test_events = test_ksh._get_events()
+    test_events = test_ksh._get_events()  # second call
+
+    expected_result = [
+        {
+            "device_id": devices_response["data"]["devices"][0]["device_id"],
+            "events": events_response["data"]["events"],
+        }
+    ]
+
+    assert sorted(
+        [e.get("id") for e in expected_result[0].get("events")]
+    ) == sorted(
+        [e.get("id") for e in test_events[0].get("events")]
+    )
+
+
+@mock.patch("kodaksmarthome.api.KodakSmartHome._http_request")
 @mock.patch("kodaksmarthome.api.KodakSmartHome.connect")
 def test__get_events_is_connected_false(mock__http_request, mock_connect):
 
