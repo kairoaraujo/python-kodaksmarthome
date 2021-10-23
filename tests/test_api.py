@@ -397,7 +397,7 @@ def test__get_events_with_existent_events(mock__http_request):
     test_ksh.devices = devices_response["data"]["devices"]
     test_ksh.is_connected = True
     test_events = test_ksh._get_events()
-    test_events = test_ksh._get_events() # second call
+    test_events = test_ksh._get_events()  # second call
 
     expected_result = [
         {
