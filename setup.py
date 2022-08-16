@@ -43,7 +43,7 @@ if sys.argv[-1] == "publish":
 
 packages = ["kodaksmarthome"]
 
-requires = ["requests==2.22.0"]
+requires = ["requests>=2.22.0"]
 test_requirements = ["pytest>=3"]
 
 about = {}
