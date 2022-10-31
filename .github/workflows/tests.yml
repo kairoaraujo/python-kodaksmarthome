@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-python@v1
       with:
-        python-version: '3.7'
+        python-version: '3.9'
 
     # Install dependencies
     - name: Install tox and coverage
@@ -20,7 +20,7 @@ jobs:
 
     # Runs Python tests
     - name: Run Python tests
-      run: make py37-tests
+      run: make py39-tests
 
     # Uploads the coverage
     - name: Upload coverage to Codecov
