@@ -9,7 +9,7 @@
 # Python Kodak Smart Home
 
 
-Python Kodak Smart Home is a library written in Python 3 (>=3.7) that works as API for
+Python Kodak Smart Home is a library written in Python 3 (>=3.9) that works as API for
 [Kodak Smart Home Portal](https://kodaksmarthome.com).
 
 This API uses the credentials from Kodak Smart Home Portal to fetch devices

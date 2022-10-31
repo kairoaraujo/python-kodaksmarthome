@@ -7,15 +7,9 @@ all-tests:
 	tox -r
 	coverage xml
 
-py36-tests:
-	tox -re py36,pep8
-
-py37-tests:
-	tox -re py37,pep8
+py39-tests:
+	tox -re py39,pep8
 	coverage xml
-
-py38-tests:
-	tox -re py38,pep8
 
 publish:
 	pip install 'twine>=1.5.0'
